@@ -4,6 +4,9 @@ begin
   variavelteste := 10 * 10 + 10 <= 11 * 12 + 13;
   outravariavelteste := 10 * 10 + 15 <= 11 * 12 + 13;
   
+  chamadandoprocedimento(10 * 10 + 10 <= 10 * 10 + 157 , 
+  158 * 10 + 10 <= 10 * 10 + 15);
+
   if 10 * 10 + 10 <= 10 * 10 + 16 then
     if 10 * 10 + 10 <= 10 * 10 + 15 then
       variavelteste := + 1;

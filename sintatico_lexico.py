@@ -227,7 +227,7 @@ def relacao():
 def lista_de_expressoes():
     expressao()
     if token.nome == ',':
-        lista_de_expressoes
+        lista_de_expressoes()
     else:
         return
 
