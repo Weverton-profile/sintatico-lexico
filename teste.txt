@@ -1,0 +1,9 @@
+program teste;
+begin
+  variavelteste := 10 * 10 + 10 <= 11 * 12 + 13;
+  outravariavelteste := 10 * 10 + 15 <= 11 * 12 + 13;
+  if 10 * 10 + 10 <= 10 * 10 + 15 then
+    variavelteste := + 1;
+  else
+    outravariavelteste := +1;
+end
