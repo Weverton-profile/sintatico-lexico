@@ -251,8 +251,8 @@ def termo():
     obter_token()
     if token.nome == '(':
         lista_de_expressoes()
-        obter_token()
         if token.nome == ')':
+            obter_token()
             return
         else:
             sys.exit(f'Erro Sintatico: foi aberto "(" e não foi fechado. Linha: {linha + 1}.')
