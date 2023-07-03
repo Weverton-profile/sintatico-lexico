@@ -293,7 +293,7 @@ def expressao():
     return
 
 def comando_sem_rotulo():
-    global linha, token
+    global linha, token, condicional
     if token.tipo == 'IDENTIFICADOR' and token.nome != 'end':
         obter_token()
         if token.nome == ':=':
@@ -312,14 +312,12 @@ def comando_sem_rotulo():
         if token.nome == 'then':
             obter_token()
             comando_sem_rotulo()
-            if token.nome == 'else':
-                print(token.nome)
-                obter_token()
-                comando_sem_rotulo()
-            else:
-                return
+            condicional = True
         else:
             sys.exit(f'Erro Sintatico: bloco condicional incompleto. Linha: {linha + 1}.')
+    elif token.nome == 'else' and condicional == True:
+          obter_token()
+          comando_sem_rotulo()
     elif token.nome == 'while':
         expressao()
         if token.nome == 'do':
@@ -369,6 +367,8 @@ def sintatico():
 
 import sys
 
+global condicional
+condicional = False
 global linha
 linha = 0
 global indice
