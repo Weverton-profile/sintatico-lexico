@@ -13,10 +13,10 @@ def lexico(num_linha, indice):
     global comentario
     mensagem = ''
     with open('teste.txt', 'r') as arquivo:
-      linhas = arquivo.readlines()
-      if num_linha >= len(linhas):
-        return None
-      linha = linhas[num_linha]
+        linhas = arquivo.readlines()
+        if num_linha >= len(linhas):
+            return None
+        linha = linhas[num_linha]
     if '\n' not in linha:
         linha += '\n'
     while indice < len(linha):
@@ -215,9 +215,7 @@ def obter_token():
     if isinstance(token, Token):
         return token
     elif token == '\n':
-        token, linha, indice = lexico(linha, indice) if lexico(linha, indice) is not None else (Token('ERROR', 'none'), linha, indice)
-        if isinstance(token, Token):
-            return token
+        obter_token()
 
 def relacao():
   global linha, token
@@ -330,6 +328,7 @@ def comando_sem_rotulo():
         sys.exit(f'Erro Sintatico: era esperado uma composição de comando sem rotulo ou "end" para finalizar o codigo. Linha: {linha + 1}.')
 
 def comando_composto():
+    global token
     comando_sem_rotulo()
     if token.nome == ';':
         obter_token()
