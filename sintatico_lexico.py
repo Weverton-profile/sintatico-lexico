@@ -5,12 +5,11 @@ class Token:
 
 import string
 
-palavras_reservadas = ['program', 'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double', 'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin']
+palavras_reservadas = ['program', 'var', 'type', 'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double', 'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin']
 
 def lexico(num_linha, indice):
     token = ''
-    global estado
-    global comentario
+    global estado, comentario
     mensagem = ''
     with open('teste.txt', 'r') as arquivo:
         linhas = arquivo.readlines()
@@ -30,7 +29,7 @@ def lexico(num_linha, indice):
                 elif caractere == "-":
                     token += caractere
                     estado = 11
-                elif caractere in [str(x) for x in range(0, 9)]:
+                elif caractere in [str(x) for x in range(0, 10)]:
                     token += caractere
                     estado = 12
                 elif caractere in [';', ',', '.', '(', ')', '{', '}', '=']:
@@ -39,7 +38,7 @@ def lexico(num_linha, indice):
                 elif caractere == "<":
                     token += caractere
                     estado = 16
-                elif caractere in [')', ':', '*', '+']:
+                elif caractere in ['>', ':', '*', '+']:
                     token += caractere
                     estado = 17
                 elif caractere == "@":
@@ -56,7 +55,7 @@ def lexico(num_linha, indice):
                     mensagem = f'Erro lexico: caractere não reconhecido "{caractere}".'
                     estado = -1
             elif estado == 1:
-                if (caractere in [str(x) for x in range(0, 9)] or
+                if (caractere in [str(x) for x in range(0, 10)] or
                     caractere in string.ascii_lowercase):
                     token += caractere
                     estado = 2
@@ -70,7 +69,7 @@ def lexico(num_linha, indice):
                     estado = 0
                     return Token('IDENTIFICADOR', token), num_linha, indice
             elif estado == 3:
-                if caractere in string.ascii_lowercase or caractere in [str(x) for x in range(0, 9)]:
+                if caractere in string.ascii_lowercase or caractere in [str(x) for x in range(0, 10)]:
                     token += caractere
                     estado = 2
                 else:
@@ -84,7 +83,7 @@ def lexico(num_linha, indice):
                     mensagem = f'Erro lexico: você tem "{token}". "{token[-1]}" não pode finalizar um identificador.'
                     estado = -1
             elif estado == 2:
-                if (caractere in [str(x) for x in range(0, 9)] or
+                if (caractere in [str(x) for x in range(0, 10)] or
                     caractere in string.ascii_lowercase):
                     token += caractere
                     estado = 2
@@ -115,13 +114,11 @@ def lexico(num_linha, indice):
                 return '\n', num_linha + 1, 0
             elif estado == 7:
                 if caractere == "/":
-                    token += caractere
                     comentario = True
                     token = ''
                     estado = 8
                     return '\n', num_linha + 1, 0
                 elif caractere == "*":
-                    token += caractere
                     comentario = True
                     token = ''
                     estado = 22
@@ -130,14 +127,14 @@ def lexico(num_linha, indice):
                     estado = 0
                     return Token('SIMBOLO_ESPECIAL', token), num_linha, indice
             elif estado == 11:
-                if caractere in [str(x) for x in range(0, 9)]:
+                if caractere in [str(x) for x in range(0, 10)]:
                     token += caractere
                     estado = 12
                 else:
                     estado = 0
                     return Token('SIMBOLO_ESPECIAL', token), num_linha, indice
             elif estado == 12:
-                if caractere in [str(x) for x in range(0, 9)]:
+                if caractere in [str(x) for x in range(0, 10)]:
                     token += caractere
                     estado = 12
                 elif caractere == ",":
@@ -147,14 +144,14 @@ def lexico(num_linha, indice):
                     estado = 0
                     return Token('DIGITO', token), num_linha, indice
             elif estado == 13:
-                if caractere in [str(x) for x in range(0, 9)]:
+                if caractere in [str(x) for x in range(0, 10)]:
                     token += caractere
                     estado = 14
                 else:
                     mensagem = f'Erro lexico: você tem "{token}". "{token[-1]}" não pode finalizar um dígito.'
                     estado = -1
             elif estado == 14:
-                if caractere in [str(x) for x in range(0, 9)]:
+                if caractere in [str(x) for x in range(0, 10)]:
                     token += caractere
                     estado = 14
                     if indice + 1 == len(linha):
@@ -185,6 +182,7 @@ def lexico(num_linha, indice):
             if estado == 8:
                 if caractere == "/":
                     estado = 9
+                    return lexico(num_linha, indice +1)
                 else:
                   if '//' in linha:
                     return lexico(num_linha, linha.find('/'))
@@ -193,9 +191,11 @@ def lexico(num_linha, indice):
                 if caractere == "/":
                     comentario = False
                     estado = 0
+                    return '\n', num_linha + 1, 0
             elif estado == 22:
                 if caractere == "*":
                     estado = 23
+                    return lexico(num_linha, indice +1)
                 else:
                   if '*/' in linha:
                     return lexico(num_linha, linha.find('*'))
@@ -204,10 +204,13 @@ def lexico(num_linha, indice):
                 if caractere == "/":
                     comentario = False
                     estado = 0
+                    return '\n', num_linha + 1, 0
 
         indice += 1
         if mensagem != '':
             sys.exit(f'{mensagem} Linha: {num_linha + 1}.')
+        if comentario == True:
+            sys.exit('um comentario de varias linha foi aberto e não foi fechado.')
 
 def obter_token():
     global linha, indice, token
@@ -228,8 +231,6 @@ def lista_de_expressoes():
     expressao()
     if token.nome == ',':
         lista_de_expressoes()
-    else:
-        return
 
 def fator():
     global linha, token
@@ -253,14 +254,11 @@ def termo():
         lista_de_expressoes()
         if token.nome == ')':
             obter_token()
-            return
         else:
             sys.exit(f'Erro Sintatico: foi aberto "(" e não foi fechado. Linha: {linha + 1}.')
     elif token.nome in ['*', 'div', 'and']:
         obter_token()
         termo()
-    else:
-        return
 
 def expressao_simples():
     global linha, token
@@ -277,9 +275,6 @@ def expressao_simples():
         while token.nome in ['+', '-', 'or']:
           obter_token()
           termo()
-        return
-    else:
-        return
 
 def expressao():
     obter_token()
@@ -288,19 +283,17 @@ def expressao():
         relacao()
         obter_token()
         expressao_simples()
-    return
 
 def comando_sem_rotulo():
     global linha, token, condicional
     if token.tipo == 'IDENTIFICADOR' and token.nome != 'end':
         obter_token()
-        if token.nome == ':=':
+        if token.nome in [':=', '+=', '*=']:
             expressao()
         elif token.nome == '(':
             lista_de_expressoes()
             if token.nome == ')':
                 obter_token()
-                return
             else:
                 sys.exit(f'Erro Sintatico: foi aberto "(" e não foi fechado. Linha: {linha + 1}.')
         else:
@@ -321,7 +314,6 @@ def comando_sem_rotulo():
         if token.nome == 'do':
             obter_token()
             comando_sem_rotulo()
-            return
         else:
             sys.exit(f'Erro Sintatico: era esperado uma composição de loop. Linha: {linha + 1}.')
     else:
@@ -339,11 +331,169 @@ def comando_composto():
     else:
         sys.exit(f'Erro Sintatico: era esperado um ";". Linha: {linha + 1}.')
 
+def tipo():
+    global linha, token
+    if token.tipo == 'IDENTIFICADOR' or token.nome in ['integer', 'boolean', 'double', 'char']:
+        return
+    else:
+        sys.exit(f'Erro Sintatico: era esperado um tipo. Linha: {linha + 1}.')
+
+def lista_de_identificadores():
+    global linha, token
+    if token.tipo == 'IDENTIFICADOR':
+        obter_token()
+        if token.nome == ',':
+            obter_token()
+            lista_de_identificadores()
+    else:
+        sys.exit(f'Erro Sintatico: era esperado um IDENTIFICADOR. Linha: {linha + 1}.')
+
+def parametros_formais():
+    global linha, token
+    obter_token()
+    lista_de_identificadores()
+    if token.nome == ':':
+        obter_token()
+        if token.tipo == 'IDENTIFICADOR':
+            obter_token()
+            if token.nome == ';':
+                parametros_formais()
+                return
+        else:
+            sys.exit(f'Erro Sintatico: era esperado uma composição de parametros formais. Linha: {linha + 1}.')
+    else:
+        sys.exit(f'Erro Sintatico: era esperado uma composição de parametros formais. Linha: {linha + 1}.')
+    if token.nome == ')':
+        obter_token()
+        if token.nome == ';':
+            obter_token()
+            definicao_de_procedimento()
+        elif token.nome == ':':
+            obter_token()
+            definicao_de_funcao()
+        else:
+              sys.exit(f'Erro Sintatico: era uma composição de funcao ou procedimento. Linha: {linha + 1}.')
+    else:
+        sys.exit(f'Erro Sintatico: foi aberto "(" e não foi fechado. Linha: {linha + 1}.')
+
+def definicao_de_funcao():
+    global linha, token
+    if token.tipo == 'IDENTIFICADOR':
+        obter_token()
+        if token.nome == ';':
+            obter_token()
+            if token.nome in ['procedure', 'function']:
+                obter_token()
+                definicao_de_sub_rotina()
+            else:
+                if token.nome == 'begin':
+                    obter_token()
+                    comando_composto()
+                else:
+                    sys.exit(f'Erro Sintatico: era uma composição de bloco. Linha: {linha + 1}.')
+        else:
+            sys.exit(f'Erro Sintatico: era esperado ";" para finalizar uma definição de função. Linha: {linha + 1}.')
+    else:
+        sys.exit(f'Erro Sintatico: era uma composição de funcao. Linha: {linha + 1}.')
+
+def definicao_de_procedimento():
+    global linha, token
+    if token.nome in ['procedure', 'function']:
+        obter_token()
+        definicao_de_sub_rotina()
+    else:
+        if token.nome == 'begin':
+            obter_token()
+            comando_composto()
+        else:
+            sys.exit(f'Erro Sintatico: era uma composição de bloco. Linha: {linha + 1}.')
+
+def definicao_de_sub_rotina():
+    global linha, token
+    if token.tipo == 'IDENTIFICADOR':
+        obter_token()
+        if token.nome == ';':
+            obter_token()
+            definicao_de_procedimento()
+        elif token.nome == ':':
+            obter_token()
+            definicao_de_funcao()
+        elif token.nome == '(':
+            parametros_formais()     
+        else:
+            sys.exit(f'Erro Sintatico: era esperado uma composição de sub-rotina. Linha: {linha + 1}.')
+    else:
+        sys.exit(f'Erro Sintatico: era esperado uma composição de sub-rotina. Linha: {linha + 1}.')
+
+def definicao_de_var():
+    global linha, token
+    lista_de_identificadores()
+    if token.nome == ':':
+        obter_token()
+        tipo()
+        obter_token()
+        if token.nome == ';':
+            obter_token()
+            if token.tipo == 'IDENTIFICADOR':
+                definicao_de_var()
+            else:
+                if token.nome == 'begin':
+                    obter_token()
+                    comando_composto()
+                elif token.nome in ['procedure', 'function']:
+                    obter_token()
+                    definicao_de_sub_rotina()
+                else:
+                    sys.exit(f'Erro Sintatico: era uma composição dos seguintes blocos (comando composto, sub-rotina). Linha: {linha + 1}.')
+        else:
+            sys.exit(f'Erro Sintatico: era esperado ";" para finalizar uma definição de variaveis. Linha: {linha + 1}.')
+    else:
+        sys.exit(f'Erro Sintatico: era esperado uma composição de definição de variavel. Linha: {linha + 1}.')
+
+def definicao_de_tipo():
+    global linha, token
+    if token.tipo == 'IDENTIFICADOR':
+        obter_token()
+        if token.nome == '=':
+            obter_token()
+            tipo()
+            obter_token()
+            if token.nome == ';':
+                obter_token()
+                if token.tipo == 'IDENTIFICADOR':
+                    definicao_de_tipo()
+            else:
+                sys.exit(f'Erro Sintatico: era esperado ";" para finalizar uma definição de tipo. Linha: {linha + 1}.')
+        else:
+            sys.exit(f'Erro Sintatico: era esperado uma estrutura de definição de tipo. Linha: {linha + 1}.')
+    else:
+        sys.exit(f'Erro Sintatico: era esperado uma estrutura de definição de tipo. Linha: {linha + 1}.')
+
 def bloco():
     global linha, token
     if token.nome == 'begin':
         obter_token()
         comando_composto()
+    elif token.nome == 'type':
+        obter_token()
+        definicao_de_tipo()
+        if token.nome == 'begin':
+            obter_token()
+            comando_composto()
+        elif token.nome == 'var':
+            obter_token()
+            definicao_de_var()
+        elif token.nome in ['procedure', 'function']:
+            obter_token()
+            definicao_de_sub_rotina()
+        else:
+            sys.exit(f'Erro Sintatico: era uma composição dos seguintes blocos (variavel, comando composto, sub-rotina). Linha: {linha + 1}.')
+    elif token.nome == 'var':
+        obter_token()
+        definicao_de_var()
+    elif token.nome == 'procedure' or token.nome == 'function':
+        obter_token()
+        definicao_de_sub_rotina()
     else:
         sys.exit(f'Erro Sintatico: era uma composição de bloco. Linha: {linha + 1}.')
 

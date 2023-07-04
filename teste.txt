@@ -1,13 +1,29 @@
 program teste;
+
+type variavelteste = integer; outravariavelteste = double;
+maisumavariavel = double;
+
+var variavelteste : integer;
+outravariavelteste, maisumavariavel : double;
+
+function functionteste ( teste1, maisteste : testando): maisteste;
+procedure procedureteste;
+procedure outraprocedureteste ( teste, maisteste : testando; testecontinua : acabouoteste);
+function outrafunctionteste : maisteste; 
+
 begin
 
-  variavelteste := 10 * 10 + 10 <= 11 * 12 + 13;
-  outravariavelteste := 10 * 10 + 15 <= 11 * 12 + 13;
-  maisumavariavel := + teste(37 * 10 + 10 <= 11 * 12 + 13);
+  @@ teste de atribuição
+  variavelteste := 10 * 19 + 10 <= 11 * 12 + 13;
+  outravariavelteste += 10 * 10 + 15 >= 11 * 12 + 13;
+  @@ teste de chamada de atribuição com chamada de função
+  maisumavariavel *= + teste(37 * 10 + 10 <> 11 * 12 + 13);
 
+  @@ teste de chamada de procedimento
   chamadandoprocedimento(10 * 10 + 10 <= 10 * 10 + 157 , 
   158 * 10 + 10 <= 10 * 10 + 15);
 
+  @@ teste de if else encadeado com outro if else
   if 10 * 10 + 10 <= 10 * 10 + 16 then
     if 10 * 10 + 10 <= 10 * 10 + 15 then
       variavelteste := + 1;
@@ -19,8 +35,9 @@ begin
     else
       outravariavelteste := +1;
 
+  @@ teste de while com blocos de if else
   while 10 * 10 + 10 <= 11 * 12 + 13 do
-  
+
     if 10 * 10 + 10 <= 10 * 10 + 15 then
       if 10 * 10 + 10 <= 10 * 10 + 15 then
         variavelteste := + 1;
