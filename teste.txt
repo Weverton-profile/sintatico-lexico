@@ -1,16 +1,21 @@
-program teste;
+program exemplo;
+  type
+    meutipo = integer;
 
-type variavelteste = integer; outravariavelteste = double;
-maisumavariavel = double;
+  var
+  x, y: meutipo;
+  z: boolean;
 
-var variavelteste : integer;
-outravariavelteste, maisumavariavel : double;
-
-function functionteste ( teste1, maisteste : testando): maisteste;
-procedure procedureteste;
-procedure outraprocedureteste ( teste, maisteste : testando; testecontinua : acabouoteste);
-function outrafunctionteste : maisteste; 
-
+  procedure p1(v,v2:id1);
+      var teste: v;
+      begin
+          v1 := + p1 * p2 = p3;
+      end;
+  function p1(v,v2:id1):id1;
+      type teste = char;
+      begin
+          v2 := -5;
+      end;
 begin
 
   @@ teste de atribuição
